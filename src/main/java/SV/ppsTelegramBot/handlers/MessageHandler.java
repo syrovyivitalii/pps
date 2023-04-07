@@ -48,14 +48,15 @@ public class MessageHandler implements Handler <Message> {
                 protocol.setTracks(null);
                 protocol.setT(1);
                 protocol.setR(1);
-            }else if (messageText.equals("Штурмова драбина")){
+                protocol.results.clear();
+            }else if (messageText.equals("Штурмова драбина") || messageText.equals("Стометрівка з перешкодами") || messageText.equals("Естафета чотири по сто метрів")){
                 protocol.setCompetition(messageText);
                 sendMessage.setText(service.getRace());
             } else {
                 if (isDouble(messageText)){
                     if (protocol.getCompetition() == null){
                         sendMessage.setText(service.getChooseCompetition());
-                    } else if (protocol.getCompetition().equals("Штурмова драбина")) {
+                    } else if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("Стометрівка з перешкодами") || protocol.getCompetition().equals("Естафета чотири по сто метрів")) {
                         if (protocol.getRace() == null){
                             if (Integer.parseInt(messageText) == 0){
                                 sendMessage.setText(service.getIncorrect());
@@ -71,18 +72,19 @@ public class MessageHandler implements Handler <Message> {
                                 sendMessage.setText(service.getCounter());
                             }
                         }else {
-                            if (protocol.getResultTrackOne() == null){
-                                protocol.setResultTrackOne(Double.valueOf(messageText));
-                                if (protocol.getTracks() == 1){
-                                    sendMessageToChat.setText(service.getResults(1));
-                                    messageSender.sendMessage(sendMessageToChat);
-                                    protocol.setResultTrackOne(null);
-                                    protocol.setR(protocol.getR() +1);
-                                    sendMessage.setText(service.getCounter());
-                                }else {
-                                    protocol.setT(protocol.getT()+1);
-                                    sendMessage.setText(service.getCounter());
-                                }
+                            int numTracks = protocol.getTracks();
+
+                            protocol.getResults().add(Double.valueOf(messageText));
+                            if (protocol.getResults().size() != numTracks) {
+                                protocol.setT(protocol.getT() + 1);
+                                sendMessage.setText(service.getCounter());
+                            }else {
+                                sendMessageToChat.setText(service.getResults());
+                                messageSender.sendMessage(sendMessageToChat);
+                                protocol.setR(protocol.getR() + 1);
+                                protocol.setT(1);
+                                protocol.results.clear();
+                                sendMessage.setText(service.getCounter());
                             }
                         }
                     }

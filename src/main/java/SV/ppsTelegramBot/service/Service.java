@@ -17,7 +17,7 @@ public class Service {
         return wrongData();
     }
     private String startBot(){
-        return "Вітаю! Я чат бот PPS \uD83C\uDDFA\uD83C\uDDE6 \n" +
+        return "Вітаю! Я чат бот ППС \uD83C\uDDFA\uD83C\uDDE6 \n" +
                 "Оберіть вид змагань для скаладання протоколу \uD83D\uDC47";
     }
     public String getStartBot(){
@@ -47,33 +47,16 @@ public class Service {
     public String getIncorrect(){
         return incorrect();
     }
-    private String results(int tracks){
-        String result = "Результати проведення " + protocol.getR() + " забігу: \uD83C\uDFC3\u200D♂️ \n";
-        if (tracks == 1){
-            result += "Доріжка №1 - " + protocol.getResultTrackOne();
-        } else if (tracks == 2) {
-            result += "Доріжка №1 - " + protocol.getResultTrackOne() + "\n" +
-                    "Доріжка №2 - " + protocol.getResultTrackTwo();
-        } else if (tracks == 3) {
-            result += "Доріжка №1 - " + protocol.getResultTrackOne() + "\n" +
-                    "Доріжка №2 - " + protocol.getResultTrackTwo() + "\n" +
-                    "Доріжка №3 - " + protocol.getResultTrackThree();
-        } else if (tracks == 4) {
-            result += "Доріжка №1 - " + protocol.getResultTrackOne() + "\n" +
-                    "Доріжка №2 - " + protocol.getResultTrackTwo() + "\n" +
-                    "Доріжка №3 - " + protocol.getResultTrackThree() + "\n" +
-                    "Доріжка №4 - " + protocol.getResultTrackFourth();
-        }else {
-            result += "Доріжка №1 - " + protocol.getResultTrackOne() + "\n" +
-                    "Доріжка №2 - " + protocol.getResultTrackTwo() + "\n" +
-                    "Доріжка №3 - " + protocol.getResultTrackThree() + "\n" +
-                    "Доріжка №4 - " + protocol.getResultTrackFourth() + "\n" +
-                    "Доріжка №5 - " + protocol.getResultTrackFifth();
+    private String results(){
+        String result = protocol.getCompetition() + "\uD83C\uDFC6 \n\n" +
+                "Результати проведення " + protocol.getR() + " забігу: \uD83C\uDFC3\u200D♂️ \n";
+        for (int i = 1;i<=protocol.results.size();i++){
+            result += "Доріжка №" + i + " - " + protocol.results.get(i-1) + "\n";
         }
         return result;
     }
-    public String getResults(int tracks){
-        return results(tracks);
+    public String getResults(){
+        return results();
     }
     private String counter(){
         String reply;

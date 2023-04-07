@@ -3,6 +3,8 @@ package SV.ppsTelegramBot.service;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
 @Data
 public class Protocol {
@@ -11,11 +13,6 @@ public class Protocol {
     private Integer tracks;
     private Integer r = 1;
     private Integer t = 1;
-
-    private Double resultTrackOne;
-    private Double resultTrackTwo;
-    private Double resultTrackThree;
-    private Double resultTrackFourth;
-    private Double resultTrackFifth;
+    public ArrayList<Double> results = new ArrayList<>();
 
 }
