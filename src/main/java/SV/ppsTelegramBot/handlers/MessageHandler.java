@@ -5,6 +5,7 @@ import SV.ppsTelegramBot.service.InlineKeyboard;
 import SV.ppsTelegramBot.service.Protocol;
 import SV.ppsTelegramBot.service.ReplyKeyboard;
 import SV.ppsTelegramBot.service.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -25,11 +26,17 @@ public class MessageHandler implements Handler <Message> {
         this.protocol = protocol;
         this.inlineKeyboard = inlineKeyboard;
     }
+    @Value("${chat.CHAT_ID}")
+    String chatId;
 
     @Override
     public void choose(Message message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(message.getChatId()));
+
+
+        SendMessage sendMessageToChat = new SendMessage();
+        sendMessageToChat.setChatId(chatId);
 
         if (message.hasText()){
             String messageText = message.getText();
@@ -39,46 +46,48 @@ public class MessageHandler implements Handler <Message> {
                 protocol.setCompetition(null);
                 protocol.setRace(null);
                 protocol.setTracks(null);
+                protocol.setT(1);
+                protocol.setR(1);
             }else if (messageText.equals("Штурмова драбина")){
                 protocol.setCompetition(messageText);
                 sendMessage.setText(service.getRace());
             } else {
-                if (StringUtils.isNumeric(messageText)){
+                if (isDouble(messageText)){
                     if (protocol.getCompetition() == null){
                         sendMessage.setText(service.getChooseCompetition());
                     } else if (protocol.getCompetition().equals("Штурмова драбина")) {
                         if (protocol.getRace() == null){
                             if (Integer.parseInt(messageText) == 0){
-                                sendMessage.setText("Ви ввели не коректні дані. Спробуйте ще раз");
+                                sendMessage.setText(service.getIncorrect());
                             }else {
                                 protocol.setRace(Integer.valueOf(messageText));
                                 sendMessage.setText(service.getTracks());
                             }
                         }else if (protocol.getRace() !=null && protocol.getTracks() == null) {
                             if (Integer.parseInt(messageText) == 0){
-                                sendMessage.setText("Ви ввели не коректні дані. Спробуйте ще раз");
+                                sendMessage.setText(service.getIncorrect());
                             }else {
                                 protocol.setTracks(Integer.valueOf(messageText));
-                                sendMessage.setText(readMessageFromUser());
+                                sendMessage.setText(service.getCounter());
                             }
                         }else {
                             if (protocol.getResultTrackOne() == null){
                                 protocol.setResultTrackOne(Double.valueOf(messageText));
                                 if (protocol.getTracks() == 1){
-                                    sendMessage.setText("Надіслати в інший чат результати");
-                                    messageSender.sendMessage(sendMessage);
+                                    sendMessageToChat.setText(service.getResults(1));
+                                    messageSender.sendMessage(sendMessageToChat);
                                     protocol.setResultTrackOne(null);
                                     protocol.setR(protocol.getR() +1);
-                                    sendMessage.setText(readMessageFromUser());
+                                    sendMessage.setText(service.getCounter());
                                 }else {
                                     protocol.setT(protocol.getT()+1);
-                                    sendMessage.setText(readMessageFromUser());
+                                    sendMessage.setText(service.getCounter());
                                 }
                             }
                         }
                     }
                 }else {
-                    sendMessage.setText("Введено помилкові дані " + messageText);
+                    sendMessage.setText(service.getIncorrect());
                 }
             }
         }else {
@@ -86,13 +95,12 @@ public class MessageHandler implements Handler <Message> {
         }
         messageSender.sendMessage(sendMessage);
     }
-    public String readMessageFromUser(){
-        String reply;
-        if (protocol.getR() > protocol.getRace()){
-            reply = "Кінець";
-        }else {
-            reply = "Введіть результати " + protocol.getT() + " доріжки для " + protocol.getR() + " забігу";
+    public static boolean isDouble(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
-        return reply;
     }
 }
