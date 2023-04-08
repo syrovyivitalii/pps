@@ -19,10 +19,10 @@ public class ReplyKeyboard {
         //створюємо перший рядок
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.add("Штурмова драбина");
-        keyboardRow.add("Стометрівка з перешкодами");
+        keyboardRow.add("100-м смуга з перешкодами");
         //створюємо другий рядок
         KeyboardRow keyboardSecondRow = new KeyboardRow();
-        keyboardSecondRow.add("Естафета чотири по сто метрів");
+        keyboardSecondRow.add("Пожежна естафета");
         keyboardSecondRow.add("Бойове розгортання");
         //додаємо всі рядки в наш список
         keyboardRows.add(keyboardRow);
