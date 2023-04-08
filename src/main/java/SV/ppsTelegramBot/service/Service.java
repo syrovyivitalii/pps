@@ -41,6 +41,12 @@ public class Service {
     public String getTracks(){
         return tracks();
     }
+    private String teams(){
+        return "Введіть кількість команд, що приймають участь в одному забізі \uD83D\uDC68\u200D\uD83D\uDE92";
+    }
+    public String getTeams(){
+        return teams();
+    }
     private String incorrect(){
         return "Ви ввели не коректні дані. Спробуйте ще раз \uD83D\uDC47";
     }

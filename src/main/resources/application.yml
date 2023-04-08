@@ -4,3 +4,7 @@ bot:
 
 chat:
   CHAT_ID: "-967768042"
+
+password:
+  pin: "111"
+

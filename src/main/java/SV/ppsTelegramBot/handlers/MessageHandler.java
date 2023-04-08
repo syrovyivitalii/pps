@@ -28,6 +28,8 @@ public class MessageHandler implements Handler <Message> {
     }
     @Value("${chat.CHAT_ID}")
     String chatId;
+    @Value("${password.pin}")
+    String password;
 
     @Override
     public void choose(Message message) {
@@ -49,29 +51,31 @@ public class MessageHandler implements Handler <Message> {
                 protocol.setT(1);
                 protocol.setR(1);
                 protocol.results.clear();
-            }else if (messageText.equals("Штурмова драбина") || messageText.equals("Стометрівка з перешкодами") || messageText.equals("Естафета чотири по сто метрів")){
+            } else if (messageText.equals("/start@UA_PPS_bot")) {
+                sendMessage.setText("\uD83D\uDC68\u200D\uD83D\uDE92");
+            } else if (messageText.equals("Штурмова драбина") || messageText.equals("Стометрівка з перешкодами") || messageText.equals("Естафета чотири по сто метрів") || messageText.equals("Бойове розгортання")){
                 protocol.setCompetition(messageText);
                 sendMessage.setText(service.getRace());
-            } else {
-                if (isDouble(messageText)){
-                    if (protocol.getCompetition() == null){
-                        sendMessage.setText(service.getChooseCompetition());
-                    } else if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("Стометрівка з перешкодами") || protocol.getCompetition().equals("Естафета чотири по сто метрів")) {
-                        if (protocol.getRace() == null){
-                            if (Integer.parseInt(messageText) == 0){
-                                sendMessage.setText(service.getIncorrect());
-                            }else {
-                                protocol.setRace(Integer.valueOf(messageText));
-                                sendMessage.setText(service.getTracks());
-                            }
-                        }else if (protocol.getRace() !=null && protocol.getTracks() == null) {
-                            if (Integer.parseInt(messageText) == 0){
-                                sendMessage.setText(service.getIncorrect());
-                            }else {
-                                protocol.setTracks(Integer.valueOf(messageText));
-                                sendMessage.setText(service.getCounter());
-                            }
+            }else {
+                if (protocol.getCompetition() == null){
+                    sendMessage.setText(service.getChooseCompetition());
+                } else {
+                    if (protocol.getRace() == null){
+                        if (!StringUtils.isNumeric(messageText)){
+                            sendMessage.setText(service.getIncorrect());
                         }else {
+                            protocol.setRace(Integer.valueOf(messageText));
+                            sendMessage.setText(service.getTracks());
+                        }
+                    }else if (protocol.getRace() !=null && protocol.getTracks() == null) {
+                        if (!StringUtils.isNumeric(messageText)){
+                            sendMessage.setText(service.getIncorrect());
+                        }else {
+                            protocol.setTracks(Integer.valueOf(messageText));
+                            sendMessage.setText(service.getCounter());
+                        }
+                    }else {
+                        if (isDouble(messageText)){
                             int numTracks = protocol.getTracks();
 
                             protocol.getResults().add(Double.valueOf(messageText));
@@ -86,10 +90,10 @@ public class MessageHandler implements Handler <Message> {
                                 protocol.results.clear();
                                 sendMessage.setText(service.getCounter());
                             }
+                        }else {
+                            sendMessage.setText(service.getIncorrect());
                         }
                     }
-                }else {
-                    sendMessage.setText(service.getIncorrect());
                 }
             }
         }else {
