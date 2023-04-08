@@ -114,7 +114,8 @@ public class MessageHandler implements Handler <Message> {
                                 users.users.put(telegramID,password);
                                 users.setAdmin(telegramID);
                                 sendMessage.setText("Вірний пароль ✅ \n" +
-                                        "Для початку роботи скористайтеся командами чат-бота \uD83D\uDC47");
+                                        "Оберіть вид змагань для скаладання протоколу \uD83D\uDC47");
+                                sendMessage.setReplyMarkup(replyKeyboard.getMenuReplyKeyboard());
                             }
                         }
                     }
