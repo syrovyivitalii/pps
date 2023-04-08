@@ -41,12 +41,6 @@ public class Service {
     public String getTracks(){
         return tracks();
     }
-    private String teams(){
-        return "Введіть кількість команд, що приймають участь в одному забізі \uD83D\uDC68\u200D\uD83D\uDE92";
-    }
-    public String getTeams(){
-        return teams();
-    }
     private String incorrect(){
         return "Ви ввели не коректні дані. Спробуйте ще раз \uD83D\uDC47";
     }
@@ -54,12 +48,12 @@ public class Service {
         return incorrect();
     }
     private String results(){
-        String result = protocol.getCompetition() + "\uD83C\uDFC6 \n\n" +
-                "Результати проведення " + protocol.getR() + " забігу: \uD83C\uDFC3\u200D♂️ \n";
+        StringBuilder result = new StringBuilder(protocol.getCompetition() + "\uD83C\uDFC6 \n\n" +
+                "Результати проведення " + protocol.getR() + " забігу: \uD83C\uDFC3\u200D♂️ \n");
         for (int i = 1;i<=protocol.results.size();i++){
-            result += "Доріжка №" + i + " - " + protocol.results.get(i-1) + "\n";
+            result.append("Доріжка №").append(i).append(" - ").append(protocol.results.get(i - 1)).append("\n");
         }
-        return result;
+        return result.toString();
     }
     public String getResults(){
         return results();
