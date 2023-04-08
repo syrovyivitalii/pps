@@ -1,10 +1,7 @@
 package SV.ppsTelegramBot.handlers;
 
 import SV.ppsTelegramBot.messagesender.MessageSender;
-import SV.ppsTelegramBot.service.InlineKeyboard;
-import SV.ppsTelegramBot.service.Protocol;
-import SV.ppsTelegramBot.service.ReplyKeyboard;
-import SV.ppsTelegramBot.service.Service;
+import SV.ppsTelegramBot.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -18,13 +15,15 @@ public class MessageHandler implements Handler <Message> {
     private final ReplyKeyboard replyKeyboard;
     private final Protocol protocol;
     private final InlineKeyboard inlineKeyboard;
+    private final Users users;
 
-    public MessageHandler(@Lazy MessageSender messageSender, Service service, ReplyKeyboard replyKeyboard, Protocol protocol, InlineKeyboard inlineKeyboard) {
+    public MessageHandler(@Lazy MessageSender messageSender, Service service, ReplyKeyboard replyKeyboard, Protocol protocol, InlineKeyboard inlineKeyboard, Users users) {
         this.messageSender = messageSender;
         this.service = service;
         this.replyKeyboard = replyKeyboard;
         this.protocol = protocol;
         this.inlineKeyboard = inlineKeyboard;
+        this.users = users;
     }
     @Value("${chat.CHAT_ID}")
     String chatId;
@@ -34,7 +33,8 @@ public class MessageHandler implements Handler <Message> {
     @Override
     public void choose(Message message) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(String.valueOf(message.getChatId()));
+        String telegramID = String.valueOf(message.getChatId());
+        sendMessage.setChatId(telegramID);
 
 
         SendMessage sendMessageToChat = new SendMessage();
@@ -42,57 +42,72 @@ public class MessageHandler implements Handler <Message> {
 
         if (message.hasText()){
             String messageText = message.getText();
-            if (messageText.equals("/start")){
-                sendMessage.setText(service.getStartBot());
-                sendMessage.setReplyMarkup(replyKeyboard.getMenuReplyKeyboard());
-                protocol.setCompetition(null);
-                protocol.setRace(null);
-                protocol.setTracks(null);
-                protocol.setT(1);
-                protocol.setR(1);
-                protocol.results.clear();
-            } else if (messageText.equals("/start@UA_PPS_bot")) {
-                sendMessage.setText("\uD83D\uDC68\u200D\uD83D\uDE92");
-            } else if (messageText.equals("Штурмова драбина") || messageText.equals("Стометрівка з перешкодами") || messageText.equals("Естафета чотири по сто метрів") || messageText.equals("Бойове розгортання")){
-                protocol.setCompetition(messageText);
-                sendMessage.setText(service.getRace());
-            }else {
-                if (protocol.getCompetition() == null){
-                    sendMessage.setText(service.getChooseCompetition());
-                } else {
-                    if (protocol.getRace() == null){
-                        if (!StringUtils.isNumeric(messageText)){
-                            sendMessage.setText(service.getIncorrect());
-                        }else {
-                            protocol.setRace(Integer.valueOf(messageText));
-                            sendMessage.setText(service.getTracks());
-                        }
-                    }else if (protocol.getRace() !=null && protocol.getTracks() == null) {
-                        if (!StringUtils.isNumeric(messageText)){
-                            sendMessage.setText(service.getIncorrect());
-                        }else {
-                            protocol.setTracks(Integer.valueOf(messageText));
-                            sendMessage.setText(service.getCounter());
-                        }
-                    }else {
-                        if (isDouble(messageText)){
-                            int numTracks = protocol.getTracks();
-
-                            protocol.getResults().add(Double.valueOf(messageText));
-                            if (protocol.getResults().size() != numTracks) {
-                                protocol.setT(protocol.getT() + 1);
-                                sendMessage.setText(service.getCounter());
+            if (users.users.containsKey(telegramID) && users.users.containsValue(password)){
+                if (messageText.equals("/start")){
+                    sendMessage.setText(service.getStartBot());
+                    sendMessage.setReplyMarkup(replyKeyboard.getMenuReplyKeyboard());
+                    protocol.setCompetition(null);
+                    protocol.setRace(null);
+                    protocol.setTracks(null);
+                    protocol.setT(1);
+                    protocol.setR(1);
+                    protocol.results.clear();
+                } else if (messageText.equals("/start@UA_PPS_bot")) {
+                    sendMessage.setText("\uD83D\uDC68\u200D\uD83D\uDE92");
+                } else if (messageText.equals("Штурмова драбина") || messageText.equals("Стометрівка з перешкодами") || messageText.equals("Естафета чотири по сто метрів") || messageText.equals("Бойове розгортання")){
+                    protocol.setCompetition(messageText);
+                    sendMessage.setText(service.getRace());
+                }else {
+                    if (protocol.getCompetition() == null){
+                        sendMessage.setText(service.getChooseCompetition());
+                    } else {
+                        if (protocol.getRace() == null){
+                            if (!StringUtils.isNumeric(messageText)){
+                                sendMessage.setText(service.getIncorrect());
                             }else {
-                                sendMessageToChat.setText(service.getResults());
-                                messageSender.sendMessage(sendMessageToChat);
-                                protocol.setR(protocol.getR() + 1);
-                                protocol.setT(1);
-                                protocol.results.clear();
+                                protocol.setRace(Integer.valueOf(messageText));
+                                sendMessage.setText(service.getTracks());
+                            }
+                        }else if (protocol.getRace() !=null && protocol.getTracks() == null) {
+                            if (!StringUtils.isNumeric(messageText)){
+                                sendMessage.setText(service.getIncorrect());
+                            }else {
+                                protocol.setTracks(Integer.valueOf(messageText));
                                 sendMessage.setText(service.getCounter());
                             }
                         }else {
-                            sendMessage.setText(service.getIncorrect());
+                            if (isDouble(messageText)){
+                                int numTracks = protocol.getTracks();
+
+                                protocol.getResults().add(Double.valueOf(messageText));
+                                if (protocol.getResults().size() != numTracks) {
+                                    protocol.setT(protocol.getT() + 1);
+                                    sendMessage.setText(service.getCounter());
+                                }else {
+                                    sendMessageToChat.setText(service.getResults());
+                                    messageSender.sendMessage(sendMessageToChat);
+                                    protocol.setR(protocol.getR() + 1);
+                                    protocol.setT(1);
+                                    protocol.results.clear();
+                                    sendMessage.setText(service.getCounter());
+                                }
+                            }else {
+                                sendMessage.setText(service.getIncorrect());
+                            }
                         }
+                    }
+                }
+            }else {
+                if (!users.users.containsKey(telegramID) || message.isCommand()){
+                    sendMessage.setText("Введіть пароль ✍️");
+                    users.users.put(String.valueOf(message.getChatId()),"");
+                }else{
+                    if (!messageText.equals(password)){
+                        sendMessage.setText("Невірний пароль \uD83D\uDEAB");
+                    }else {
+                        users.users.put(telegramID,password);
+                        sendMessage.setText("Вірний пароль ✅ \n" +
+                                "Для початку роботи скористайтеся командами бота \uD83D\uDC47");
                     }
                 }
             }
