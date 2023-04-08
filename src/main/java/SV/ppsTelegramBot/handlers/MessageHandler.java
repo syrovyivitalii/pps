@@ -113,8 +113,7 @@ public class MessageHandler implements Handler <Message> {
                             }else {
                                 users.users.put(telegramID,password);
                                 users.setAdmin(telegramID);
-                                sendMessage.setText("Вірний пароль ✅ \n" +
-                                        "Оберіть вид змагань для скаладання протоколу \uD83D\uDC47");
+                                sendMessage.setText(service.getStartBot());
                                 sendMessage.setReplyMarkup(replyKeyboard.getMenuReplyKeyboard());
                             }
                         }

@@ -17,7 +17,7 @@ public class Service {
         return wrongData();
     }
     private String startBot(){
-        return "Вітаю! Я чат бот ППС \uD83C\uDDFA\uD83C\uDDE6 \n" +
+        return "Вітаю! Я чат-бот ППС \uD83C\uDDFA\uD83C\uDDE6 \n" +
                 "Оберіть вид змагань для скаладання протоколу \uD83D\uDC47";
     }
     public String getStartBot(){
