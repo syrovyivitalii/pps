@@ -1,5 +1,4 @@
 package SV.ppsTelegramBot.service;
-
 import org.springframework.stereotype.Component;
 
 @Component
@@ -49,14 +48,22 @@ public class Service {
     }
     private String results(){
         String[] sticker = {"\uD83D\uDD39","\uD83D\uDD38"};
-        StringBuilder result = new StringBuilder(protocol.getCompetition() + "\uD83C\uDFC6 \n\n" +
-                "Результати проведення " + protocol.getR() + " забігу: \uD83C\uDFC3\u200D♂️ \n");
+        String attempts;
+        if (protocol.getAttempts()==1){
+            attempts = "Перша спроба";
+        }else {
+            attempts = "Друга спроба";
+        }
+        StringBuilder result = new StringBuilder("<b>" + protocol.getCompetition() + "\uD83C\uDFC6 \n\n" + "</b>");
+        if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("100-м смуга з перешкодами")) {
+            result.append(attempts).append("\n");
+        }
         for (int i = 1,j=0;i<=protocol.results.size();i++,j++){
             try {
-                result.append(sticker[j]).append(" Доріжка №").append(i).append(" - ").append(protocol.results.get(i - 1)).append("\n");
+                result.append(sticker[j]).append(protocol.getR()).append("/").append(i).append(" - ").append(protocol.results.get(i - 1)).append("\n");
             }catch (ArrayIndexOutOfBoundsException exception){
                 j=0;
-                result.append(sticker[j]).append(" Доріжка №").append(i).append(" - ").append(protocol.results.get(i - 1)).append("\n");
+                result.append(sticker[j]).append(protocol.getR()).append("/").append(i).append(" - ").append(protocol.results.get(i - 1)).append("\n");
             }
         }
         return result.toString();
@@ -66,11 +73,29 @@ public class Service {
     }
     private String counter(){
         String reply;
-        if (protocol.getR() > protocol.getRace()){
-            reply = "Протокол складено ✅ \n" +
-                    "Для початку роботи скористайтеся командами чат-бота \uD83D\uDC47";
+        if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("100-м смуга з перешкодами")){
+            String attempts;
+            if (protocol.getAttempts()==1){
+                attempts = "Перша спроба";
+            }else {
+                attempts = "Друга спроба";
+            }
+            if (protocol.getAttempts()==3){
+                reply = "Протокол складено ✅ \n" +
+                        "Для початку роботи скористайтеся командами чат-бота \uD83D\uDC47";
+                protocol.getClearProtocol();
+            }else {
+                reply = attempts + "\n";
+                reply += "Введіть результати забігу №" + protocol.getR() + " на доріжці №" + protocol.getT() + " \uD83D\uDC68\u200D\uD83D\uDE92";
+            }
         }else {
-            reply = "Введіть результати забігу №" + protocol.getR() + " на доріжці №" + protocol.getT() + " \uD83D\uDC68\u200D\uD83D\uDE92";
+            if (protocol.getR() > protocol.getRace()){
+                reply = "Протокол складено ✅ \n" +
+                        "Для початку роботи скористайтеся командами чат-бота \uD83D\uDC47";
+                protocol.getClearProtocol();
+            }else {
+                reply = "Введіть результати забігу №" + protocol.getR() + " на доріжці №" + protocol.getT() + " \uD83D\uDC68\u200D\uD83D\uDE92";
+            }
         }
         return reply;
     }

@@ -1,11 +1,15 @@
 package SV.ppsTelegramBot.handlers;
 
 import SV.ppsTelegramBot.messagesender.MessageSender;
-import SV.ppsTelegramBot.service.*;
+import SV.ppsTelegramBot.service.Protocol;
+import SV.ppsTelegramBot.service.ReplyKeyboard;
+import SV.ppsTelegramBot.service.Service;
+import SV.ppsTelegramBot.service.Users;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +46,7 @@ public class MessageHandler implements Handler <Message> {
         // send the results to the group
         SendMessage sendMessageToChat = new SendMessage();
         sendMessageToChat.setChatId(chatId);
+        sendMessageToChat.setParseMode(ParseMode.HTML);
 
         // only admin can send message to bot. Bot will not reply when users in group sends a messages
         if (!telegramID.equals(chatId)){
@@ -89,13 +94,27 @@ public class MessageHandler implements Handler <Message> {
                                             protocol.setT(protocol.getT() + 1);
                                             sendMessage.setText(service.getCounter());
                                         }else {
-                                            // send message with results on tracks to another chat, increase number of races
-                                            sendMessageToChat.setText(service.getResults());
-                                            messageSender.sendMessage(sendMessageToChat);
-                                            protocol.setR(protocol.getR() + 1);
-                                            protocol.setT(1);
-                                            protocol.results.clear();
-                                            sendMessage.setText(service.getCounter());
+                                            // send message with results on tracks to another chat, increase number of races. Check and increase number of attempts
+                                            if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("100-м смуга з перешкодами")){
+                                                sendMessageToChat.setText(service.getResults());
+                                                messageSender.sendMessage(sendMessageToChat);
+                                                protocol.setR(protocol.getR() + 1);
+                                                if (protocol.getR()>protocol.getRace()){
+                                                    protocol.setAttempts(protocol.getAttempts()+1);
+                                                    protocol.setR(1);
+                                                }
+                                                protocol.setT(1);
+                                                protocol.results.clear();
+                                                sendMessage.setText(service.getCounter());
+                                            }else {
+                                                // send message with results on tracks to another chat, increase number of races
+                                                sendMessageToChat.setText(service.getResults());
+                                                messageSender.sendMessage(sendMessageToChat);
+                                                protocol.setR(protocol.getR() + 1);
+                                                protocol.setT(1);
+                                                protocol.results.clear();
+                                                sendMessage.setText(service.getCounter());
+                                            }
                                         }
                                     }else {
                                         sendMessage.setText(service.getIncorrect());
