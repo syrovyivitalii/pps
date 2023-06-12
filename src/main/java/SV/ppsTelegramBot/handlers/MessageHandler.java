@@ -13,6 +13,9 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+
 @Component
 @Slf4j
 public class MessageHandler implements Handler <Message> {
@@ -86,37 +89,42 @@ public class MessageHandler implements Handler <Message> {
                                         sendMessage.setText(service.getCounter());
                                     }
                                 }else {
-                                    if (isDouble(messageText)){
-                                        // set results of track for each race
-                                        int numTracks = protocol.getTracks();
-                                        protocol.getResults().add(Double.valueOf(messageText));
-                                        if (protocol.getResults().size() != numTracks) {
-                                            protocol.setT(protocol.getT() + 1);
-                                            sendMessage.setText(service.getCounter());
-                                        }else {
-                                            // send message with results on tracks to another chat, increase number of races. Check and increase number of attempts
-                                            if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("100-м смуга з перешкодами")){
+                                    // set results of track for each race
+                                    int numTracks = protocol.getTracks();
+
+                                    //split message from user on lines
+                                    String[] lines = messageText.split("\n");
+                                    //check if is entered right number of lines
+                                    if (lines.length == numTracks) {
+                                        try {
+                                            for (String line : lines) {
+                                                double number = Double.parseDouble(line);
+                                                protocol.getResults().add(number);
+                                            }
+                                            Arrays.fill(lines, null);
+                                            if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("100-м смуга з перешкодами")) {
                                                 sendMessageToChat.setText(service.getResults());
                                                 messageSender.sendMessage(sendMessageToChat);
                                                 protocol.setR(protocol.getR() + 1);
-                                                if (protocol.getR()>protocol.getRace()){
-                                                    protocol.setAttempts(protocol.getAttempts()+1);
+                                                if (protocol.getR() > protocol.getRace()) {
+                                                    protocol.setAttempts(protocol.getAttempts() + 1);
                                                     protocol.setR(1);
                                                 }
-                                                protocol.setT(1);
                                                 protocol.results.clear();
                                                 sendMessage.setText(service.getCounter());
-                                            }else {
+                                            } else {
                                                 // send message with results on tracks to another chat, increase number of races
                                                 sendMessageToChat.setText(service.getResults());
                                                 messageSender.sendMessage(sendMessageToChat);
                                                 protocol.setR(protocol.getR() + 1);
-                                                protocol.setT(1);
                                                 protocol.results.clear();
                                                 sendMessage.setText(service.getCounter());
                                             }
+                                        } catch (NumberFormatException e) {
+                                            sendMessage.setText("Введені значення не є числами. Спробуйте ще раз \uD83D\uDC47");
+                                            protocol.results.clear();
                                         }
-                                    }else {
+                                    } else {
                                         sendMessage.setText(service.getIncorrect());
                                     }
                                 }
@@ -146,14 +154,5 @@ public class MessageHandler implements Handler <Message> {
             messageSender.sendMessage(sendMessage);
         }
 
-    }
-    // check if received message is double
-    public static boolean isDouble(String str) {
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 }
