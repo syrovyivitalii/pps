@@ -86,7 +86,7 @@ public class Service {
                 protocol.getClearProtocol();
             }else {
                 reply = attempts + "\n";
-                reply += "Введіть результати забігу №" + protocol.getR() + " на доріжці №" + protocol.getT() + " \uD83D\uDC68\u200D\uD83D\uDE92";
+                reply += "Введіть результати забігу №" + protocol.getR() + " на " + protocol.getTracks() + " доріжках"+" \uD83D\uDC68\u200D\uD83D\uDE92";
             }
         }else {
             if (protocol.getR() > protocol.getRace()){
@@ -94,7 +94,7 @@ public class Service {
                         "Для початку роботи скористайтеся командами чат-бота \uD83D\uDC47";
                 protocol.getClearProtocol();
             }else {
-                reply = "Введіть результати забігу №" + protocol.getR() + " на доріжці №" + protocol.getT() + " \uD83D\uDC68\u200D\uD83D\uDE92";
+                reply = "Введіть результати забігу №" + protocol.getR() + " на " + protocol.getTracks() + " доріжках"+" \uD83D\uDC68\u200D\uD83D\uDE92";
             }
         }
         return reply;
