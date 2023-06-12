@@ -102,24 +102,15 @@ public class MessageHandler implements Handler <Message> {
                                                 protocol.getResults().add(number);
                                             }
                                             Arrays.fill(lines, null);
-                                            if (protocol.getCompetition().equals("Штурмова драбина") || protocol.getCompetition().equals("100-м смуга з перешкодами")) {
-                                                sendMessageToChat.setText(service.getResults());
-                                                messageSender.sendMessage(sendMessageToChat);
-                                                protocol.setR(protocol.getR() + 1);
-                                                if (protocol.getR() > protocol.getRace()) {
-                                                    protocol.setAttempts(protocol.getAttempts() + 1);
-                                                    protocol.setR(1);
-                                                }
-                                                protocol.results.clear();
-                                                sendMessage.setText(service.getCounter());
-                                            } else {
-                                                // send message with results on tracks to another chat, increase number of races
-                                                sendMessageToChat.setText(service.getResults());
-                                                messageSender.sendMessage(sendMessageToChat);
-                                                protocol.setR(protocol.getR() + 1);
-                                                protocol.results.clear();
-                                                sendMessage.setText(service.getCounter());
+                                            sendMessageToChat.setText(service.getResults());
+                                            messageSender.sendMessage(sendMessageToChat);
+                                            protocol.setR(protocol.getR() + 1);
+                                            if (protocol.getR() > protocol.getRace()) {
+                                                protocol.setAttempts(protocol.getAttempts() + 1);
+                                                protocol.setR(1);
                                             }
+                                            protocol.results.clear();
+                                            sendMessage.setText(service.getCounter());
                                         } catch (NumberFormatException e) {
                                             sendMessage.setText("Введені значення не є числами. Спробуйте ще раз \uD83D\uDC47");
                                             protocol.results.clear();
