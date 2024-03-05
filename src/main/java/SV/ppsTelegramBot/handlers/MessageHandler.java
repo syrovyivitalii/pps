@@ -96,25 +96,19 @@ public class MessageHandler implements Handler <Message> {
                                     String[] lines = messageText.split("\n");
                                     //check if is entered right number of lines
                                     if (lines.length == numTracks) {
-                                        try {
-                                            for (String line : lines) {
-                                                double number = Double.parseDouble(line);
-                                                protocol.getResults().add(number);
-                                            }
-                                            Arrays.fill(lines, null);
-                                            sendMessageToChat.setText(service.getResults());
-                                            messageSender.sendMessage(sendMessageToChat);
-                                            protocol.setR(protocol.getR() + 1);
-                                            if (protocol.getR() > protocol.getRace()) {
-                                                protocol.setAttempts(protocol.getAttempts() + 1);
-                                                protocol.setR(1);
-                                            }
-                                            protocol.results.clear();
-                                            sendMessage.setText(service.getCounter());
-                                        } catch (NumberFormatException e) {
-                                            sendMessage.setText("Введені значення не є числами. Спробуйте ще раз \uD83D\uDC47");
-                                            protocol.results.clear();
+                                        for (String line : lines) {
+                                            protocol.getResults().add(line);
                                         }
+                                        Arrays.fill(lines, null);
+                                        sendMessageToChat.setText(service.getResults());
+                                        messageSender.sendMessage(sendMessageToChat);
+                                        protocol.setR(protocol.getR() + 1);
+                                        if (protocol.getR() > protocol.getRace()) {
+                                            protocol.setAttempts(protocol.getAttempts() + 1);
+                                            protocol.setR(1);
+                                        }
+                                        protocol.results.clear();
+                                        sendMessage.setText(service.getCounter());
                                     } else {
                                         sendMessage.setText(service.getIncorrect());
                                     }

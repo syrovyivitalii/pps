@@ -13,7 +13,7 @@ public class Protocol {
     private Integer attempts = 1;
     private Integer r = 1;
     private Integer t = 1;
-    public ArrayList<Double> results = new ArrayList<>();
+    public ArrayList<String> results = new ArrayList<>();
     private void clearProtocol (){
         competition = null;
         race = null;
